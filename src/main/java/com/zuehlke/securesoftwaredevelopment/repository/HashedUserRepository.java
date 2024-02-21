@@ -32,8 +32,10 @@ public class HashedUserRepository {
                 return new HashedUser(username, passwordHash, salt, totpKey);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error while trying to find user with USERNAME = " + username + "; " + e.getMessage(), e);
         }
+
+        LOG.info("User not found for USERNAME = " + username);
         return null;
     }
 
@@ -45,8 +47,10 @@ public class HashedUserRepository {
             statement.setString(2, username);
 
             statement.executeUpdate();
+
+            LOG.info("Totp key saved successfully for USERNAME = " + username);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error saving Totp key for USERNAME = " + username + "; " + e.getMessage(), e);
         }
     }
 }

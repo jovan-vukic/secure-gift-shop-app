@@ -12,7 +12,7 @@
 <div layout:fragment="content">
   <h1>Gifts</h1>
   <div class="container">
-    <div class="input-group mb-3">
+    <div class="input-group mb-3" sec:authorize="hasAuthority('VIEW_GIFT_LIST')">
       <input type="text" id="searchQuery" class="form-control">
       <div class="input-group-append">
         <button class="btn btn-outline-primary" id="giftSearchButton" type="button" onclick="search()">Search
@@ -23,7 +23,7 @@
     <p class="invisible text-danger" id="giftSearchErrorMessage">Sorry, we are facing some problems! Please try again
       later.</p>
     <table class="table">
-      <thead>
+      <thead sec:authorize="hasAuthority('VIEW_GIFT_LIST')">
       <tr>
         <th scope="col">#</th>
         <th scope="col">Title</th>
@@ -32,7 +32,7 @@
         <th></th>
       </tr>
       </thead>
-      <tbody id="giftsTableContent">
+      <tbody id="giftsTableContent" sec:authorize="hasAuthority('VIEW_GIFT_LIST')">
       <tr th:each="gift: ${gifts}">
         <td th:text="${gift.id}"></td>
         <td th:text="${gift.name}"></td>
@@ -41,8 +41,8 @@
         <td><a th:href="@{/gifts(id=${gift.id})}">Details</a></td>
       </tr>
       </tbody>
-    </table>
-    <a href="/create-form">Add Gift</a>
+    </table >
+    <a href="/create-form" sec:authorize="hasAuthority('CREATE_GIFT')">Add Gift</a>
   </div>
   <template id="row-template">
     <tr>
@@ -126,8 +126,10 @@
       }
     }
 
-    const searchQueryInput = document.getElementById('searchQuery');
-    searchQueryInput.addEventListener('keyup', onEnter);
+    if (document.getElementById('searchQuery') !== null) {
+      const searchQueryInput = document.getElementById('searchQuery');
+      searchQueryInput.addEventListener('keyup', onEnter);
+    }
   </script>
 </div>
 </body>

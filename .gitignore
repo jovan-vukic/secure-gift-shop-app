@@ -1,29 +1,60 @@
-### IntelliJ IDEA ###
+# IntelliJ IDEA
 out/
+.idea/
+.idea_modules/
+*.iml
+*.ipr
+*.iws
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
+# Java Related Files
+*.class
+.mtj.tmp/
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
 .project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+.classpath
+factoryConfiguration.json
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-
-### Mac OS ###
+# Windows Specific Files
+Thumbs.db
 .DS_Store
+
+# Project Specific Files
+target/
+**/node_modules/
+bower_components/
+
+# Misc
+/.sass-cache/
+/connect.lock
+/coverage/*
+/libpeerconnection.log
+
+# Logs
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log
+testem.log
+/typings/
+*.log
+*.log.*
+
+# Maven Related Files
+!.mvn/wrapper/maven-wrapper.jar
+!/.mvn/wrapper/maven-wrapper.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties

@@ -39,11 +39,11 @@
           <label>Rating:</label>
           <b><label th:text="${averageRating}"></label></b>
       </div>
-      <div class="form-group">
+      <div class="form-group" sec:authorize="hasAuthority('RATE_GIFT')">
           <label>My rating:</label>
           <b><label th:text="${userRating}"></label></b>
       </div>
-      <div class="form-group">
+      <div class="form-group" sec:authorize="hasAuthority('RATE_GIFT')">
           <input type="radio" id="1" name="rating" value="1">
           <label for="1">1</label>
           <input type="radio" id="2" name="rating" value="2">
@@ -58,15 +58,15 @@
       </div>
       </form>
   </div>
-  <div class="mt-2 mb-2">
+  <div class="mt-2 mb-2" sec:authorize="hasAuthority('BUY_GIFT')">
       <a th:href="@{'/buy-gift/' + ${gift.id}}">Buy gift</a>
   </div>
   <h2 id="gift-comments">Gift comments</h2>
   <div class="form-group" th:each="comment,iter : ${comments}">
     <b th:text="${comment.personName}"></b>
-    <div class="form-control" th:id="${iter.index}" th:utext="${comment.comment}" disabled></div>
+    <div class="form-control" th:id="${iter.index}" th:text="${comment.comment}" disabled></div>
   </div>
-  <div class="form-group">
+  <div class="form-group" sec:authorize="hasAuthority('ADD_COMMENT')">
     <label for="addComment">Add comment</label>
     <textarea class="form-control" id="addComment" rows="3" placeholder="Comment..."></textarea>
     <button id="createComment" class="btn btn-primary mt-2">Create comment</button>
@@ -79,39 +79,45 @@
   <script>
     window.addEventListener('load', function () {
 
-        document.getElementById("rateGift").addEventListener("click", function () {
-            const rating = document.querySelector('input[name="rating"]:checked').value;
-            fetch('/ratings', {
-                method: 'POST',
-                body: JSON.stringify({
-                    giftId: giftID,
-                    rating: rating
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(function () {
-                console.log(window.location)
-                window.location.reload();
+        if (document.getElementById("rateGift") !== null) {
+            document.getElementById("rateGift")
+                .addEventListener("click", function () {
+                const rating = document.querySelector('input[name="rating"]:checked').value;
+                fetch('/ratings', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        giftId: giftID,
+                        rating: rating
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function () {
+                    console.log(window.location)
+                    window.location.reload();
+                });
             });
-        });
+        }
 
-      document.getElementById("createComment").addEventListener("click", function () {
-        const comment = document.getElementById("addComment").value;
+        if (document.getElementById("createComment") !== null) {
+            document.getElementById("createComment")
+                .addEventListener("click", function () {
+                const comment = document.getElementById("addComment").value;
 
-        fetch('/comments', {
-          method: 'POST',
-          body: JSON.stringify({
-            giftId: giftID,
-            comment: comment
-          }),
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(function () {
-          window.location.reload();
-        });
-      });
+                fetch('/comments', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        giftId: giftID,
+                        comment: comment
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function () {
+                    window.location.reload();
+                });
+            });
+        }
     });
   </script>
 </div>

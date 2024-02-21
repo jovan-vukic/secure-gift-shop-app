@@ -31,8 +31,10 @@ public class TagRepository {
             while (rs.next()) {
                 tagList.add(new Tag(rs.getInt(1), rs.getString(2)));
             }
+
+            // LOG.info("Retrieved " + tagList.size() + " tags from the database.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while retrieving tags from DB; " + e.getMessage(), e);
         }
         return tagList;
     }

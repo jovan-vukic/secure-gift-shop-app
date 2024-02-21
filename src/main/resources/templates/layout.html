@@ -47,15 +47,15 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" th:href="@{/gifts}">Christmas Gift Shop</a>
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasAuthority('VIEW_GIFT_LIST') or hasAuthority('CREATE_GIFT')">
                 <a class="nav-link" th:href="@{/gifts}">Gifts</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasAuthority('VIEW_PERSONS_LIST')">
                 <a class="nav-link" th:href="@{/persons}">Users</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasAuthority('VIEW_MY_PROFILE')">
                 <a class="nav-link" th:href="@{/myprofile}">My Profile</a>
             </li>
             <li class="nav-item">

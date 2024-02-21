@@ -34,12 +34,12 @@ public class PersonRepository {
                 personList.add(createPersonFromResultSet(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error retrieving person list; " + e.getMessage(), e);
         }
         return personList;
     }
 
-    public List<Person> search(String searchTerm) throws SQLException {
+    public List<Person> search(String searchTerm) {
         List<Person> personList = new ArrayList<>();
         String query = "SELECT id, firstName, lastName, email FROM persons WHERE UPPER(firstName) like UPPER('%" + searchTerm + "%')" +
                 " OR UPPER(lastName) like UPPER('%" + searchTerm + "%')";
@@ -49,6 +49,8 @@ public class PersonRepository {
             while (rs.next()) {
                 personList.add(createPersonFromResultSet(rs));
             }
+        } catch (SQLException e) {
+            LOG.warn("Persons search failed for SEARCH_TERM = " + searchTerm + "; " + e.getMessage(), e);
         }
         return personList;
     }
@@ -62,9 +64,10 @@ public class PersonRepository {
                 return createPersonFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Error retrieving person with ID = " + personId + "; " + e.getMessage(), e);
         }
 
+        LOG.info("Person not found for ID = " + personId);
         return null;
     }
 
@@ -74,8 +77,9 @@ public class PersonRepository {
              Statement statement = connection.createStatement();
         ) {
             statement.executeUpdate(query);
+            auditLogger.audit("Deleted person with ID = " + personId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Error while deleting person with ID = " + personId + "; " + e.getMessage(), e);
         }
     }
 
@@ -99,8 +103,15 @@ public class PersonRepository {
             statement.setString(1, firstName);
             statement.setString(2, email);
             statement.executeUpdate();
+
+            auditLogger.auditChange(new Entity(
+                    "person.UPDATE",
+                    personFromDb.getId(),
+                    personFromDb.getEmail(),
+                    personUpdate.getEmail()
+            ));
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Error updating person with ID = " + personUpdate.getId() + "; " + e.getMessage(), e);
         }
     }
 }

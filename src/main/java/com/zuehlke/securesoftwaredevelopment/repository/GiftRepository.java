@@ -1,6 +1,7 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
 import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
+import com.zuehlke.securesoftwaredevelopment.config.Entity;
 import com.zuehlke.securesoftwaredevelopment.domain.Tag;
 import com.zuehlke.securesoftwaredevelopment.domain.Gift;
 import com.zuehlke.securesoftwaredevelopment.domain.NewGift;
@@ -37,12 +38,12 @@ public class GiftRepository {
                 giftList.add(gift);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Fetching all gifts failed; " + e.getMessage(), e);
         }
         return giftList;
     }
 
-    public List<Gift> search(String searchTerm) throws SQLException {
+    public List<Gift> search(String searchTerm) {
         List<Gift> giftList = new ArrayList<>();
         String query = "SELECT DISTINCT g.id, g.name, g.description, g.price FROM gift g, gift_to_tag gt, tags t" +
                 " WHERE g.id = gt.giftId" +
@@ -55,6 +56,8 @@ public class GiftRepository {
             while (rs.next()) {
                 giftList.add(createGiftFromResultSet(rs));
             }
+        } catch (SQLException e) {
+            LOG.warn("Gifts search failed for SEARCH_TERM = " + searchTerm + "; " + e.getMessage(), e);
         }
         return giftList;
     }
@@ -74,7 +77,8 @@ public class GiftRepository {
                         try {
                             return g.getId() == rs2.getInt(2);
                         } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                            LOG.warn("SQLException occurred while processing data; " + e.getMessage(), e);
+                            throw new RuntimeException("An unexpected error occurred. Please try again later.");
                         }
                     }).findFirst().get();
                     giftTags.add(tag);
@@ -83,7 +87,7 @@ public class GiftRepository {
                 return gift;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Fetching gift data failed for GIFT_ID = " + giftId + "; " + e.getMessage(), e);
         }
 
         return null;
@@ -111,13 +115,15 @@ public class GiftRepository {
                         statement2.setInt(2, tag.getId());
                         statement2.executeUpdate();
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        LOG.error("Failed to insert tag for GIFT_ID = " + finalId + "; " + e.getMessage(), e);
                     }
                 });
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Gift creation failed; " + e.getMessage(), e);
         }
+
+        LOG.info("Gift created successfully with GIFT_ID = " + id);
         return id;
     }
 
@@ -133,8 +139,10 @@ public class GiftRepository {
             statement.executeUpdate(query2);
             statement.executeUpdate(query3);
             statement.executeUpdate(query4);
+
+            auditLogger.audit("Gift and related data deleted successfully for GIFT_ID = " + giftId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Gift deletion failed for GIFT_ID = " + giftId + "; " + e.getMessage(), e);
         }
     }
 

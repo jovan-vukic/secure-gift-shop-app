@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.service;
 
+import com.zuehlke.securesoftwaredevelopment.config.SecurityUtil;
 import com.zuehlke.securesoftwaredevelopment.domain.Permission;
 import com.zuehlke.securesoftwaredevelopment.domain.User;
 import com.zuehlke.securesoftwaredevelopment.repository.UserRepository;
@@ -31,6 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUser(username);
         if (user == null) {
+            LOG.info("User not found for USERNAME = " + username);
             throw new UsernameNotFoundException("Username not found");
         }
 

@@ -23,15 +23,20 @@ public class CommentRepository {
     }
 
     public void create(Comment comment) {
-        String query = "insert into comments(giftId, userId, comment) values (" + comment.getGiftId() + ", " + comment.getUserId() + ", '" + comment.getComment() + "')";
+        String query = "insert into comments(giftId, userId, comment) values (?, ?, ?)";
 
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
+             PreparedStatement statement = connection.prepareStatement(query);
         ) {
-            statement.execute(query);
+            statement.setInt(1, comment.getGiftId());
+            statement.setInt(2, comment.getUserId());
+            statement.setString(3, comment.getComment());
+            statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Comment creation failed for GIFT_ID = " + comment.getGiftId() + "; " + e.getMessage(), e);
         }
+
+        LOG.info("Comment created successfully for GIFT_ID" + comment.getGiftId());
     }
 
     public List<Comment> getAll(String giftId) {
@@ -44,7 +49,7 @@ public class CommentRepository {
                 commentList.add(new Comment(rs.getInt(1), rs.getInt(2), rs.getString(3)));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Fetching all comments failed for GIFT_ID = " + giftId + "; " + e.getMessage(), e);
         }
         return commentList;
     }

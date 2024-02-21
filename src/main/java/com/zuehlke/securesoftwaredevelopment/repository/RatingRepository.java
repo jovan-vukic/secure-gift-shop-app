@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.Comment;
 import com.zuehlke.securesoftwaredevelopment.domain.Rating;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ import java.util.List;
 public class RatingRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(RatingRepository.class);
-
 
     private DataSource dataSource;
 
@@ -38,15 +38,17 @@ public class RatingRepository {
                 preparedStatement.setInt(2, rating.getGiftId());
                 preparedStatement.setInt(3, rating.getUserId());
                 preparedStatement.executeUpdate();
+                LOG.info("Updated rating for GIFT_ID = " + rating.getGiftId());
             } else {
                 PreparedStatement preparedStatement = connection.prepareStatement(query3);
                 preparedStatement.setInt(1, rating.getGiftId());
                 preparedStatement.setInt(2, rating.getUserId());
                 preparedStatement.setInt(3, rating.getRating());
                 preparedStatement.executeUpdate();
+                LOG.info("Added first rating for GIFT_ID = " + rating.getGiftId());
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Error while processing the rating for GIFT_ID = " + rating.getGiftId(), e);
         }
     }
 
@@ -60,7 +62,7 @@ public class RatingRepository {
                 ratingList.add(new Rating(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Error retrieving ratings for GIFT_ID = " + giftId + "; " + e.getMessage(), e);
         }
         return ratingList;
     }
